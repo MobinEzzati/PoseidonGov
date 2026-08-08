@@ -1,0 +1,15 @@
+services:          # the list of containers you want running
+  db:              # a name YOU choose for this one — could be anything
+    image: pgvector/pgvector:pg16      # which image (recipe) to build it from
+    container_name: poseidon_db   # the running container's name (for commands/logs)
+    environment:              # settings passed INTO the container at startup
+      POSTGRES_USER: poseidon       # Postgres reads these special vars
+      POSTGRES_PASSWORD: localdev   # and auto-configures itself accordingly
+      POSTGRES_DB: poseidon         # creates a database with this name on first boot
+    ports:
+      - "5432:5432"           # connect the container's port to your Mac's port
+    volumes:
+      - poseidon_pgdata:/var/lib/postgresql/data   # where the data actually lives
+
+volumes:
+  poseidon_pgdata:            # declares the named storage box used above
