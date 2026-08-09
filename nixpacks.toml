@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["postgresql"]    # install PostgreSQL client libraries
+
+[variables]
+PYTHON_VERSION = "3.12"     # force Python 3.12 instead of 3.13
