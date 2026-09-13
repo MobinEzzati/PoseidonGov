@@ -1,6 +1,6 @@
 #  PoseidonGov
 
-AI-powered deal intelligence platform for PE firms evaluating aviation and GovCon assets.
+AI-powered deal intelligence platform for PE firms evaluating aviation and GovCon assets. The main goal of this platform is to make entire process due diligence, risk assessment and evaluation much easier for PE analyst.
 
 ## What it does
 - Ingests live federal procurement data (USASpending, SAM.gov, FAA)
