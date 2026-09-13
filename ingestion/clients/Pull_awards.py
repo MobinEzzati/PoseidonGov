@@ -4,7 +4,7 @@ import requests
 url = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
 
-def pull_data_usaspending(max_pages=5):
+def pull_data_usaspending(max_pages=50):
     all_results = []
     page = 1
 
@@ -13,13 +13,23 @@ def pull_data_usaspending(max_pages=5):
             "subawards": False,
             "filters": {
                 "award_type_codes": ["A", "B", "C", "D"],
-                "naics_codes": ["481111"],
+                "naics_codes": [
+                    "481111",
+                    "481112",  # scheduled freight air transport
+                    "488190",  # other air transport support
+                    "336411",  # aircraft manufacturing
+                    "336413",  # other aircraft parts
+                    "541330",  # engineering services (defense)
+                    "561210",  # facilities support services
+                    "488111",  # air traffic control
+                ],
                 "time_period": [{"start_date": "2023-01-01", "end_date": "2025-12-31"}],
             },
             "fields": [
                  "Award ID", "Recipient Name", "Award Amount",
                  "Awarding Agency", "Awarding Sub Agency",
                  "End Date",
+                 "NAICS Code",
             ],
             "limit": 100,                  # 100 per page (the max), not 10
             "page": page,                  # <-- this changes each loop

@@ -5,6 +5,7 @@
 from fastapi import FastAPI
 import psycopg2
 import sys
+import os
 sys.path.append("..")
 from ML.risk_scoring import compute_hhi, compute_recompete_risk, interpret_hhi, interpret_recompete, get_agency_breakdown
 from ML.memo_agent import generate_memo, parse_memo
@@ -12,12 +13,19 @@ from ML.memo_agent import generate_memo, parse_memo
 app = FastAPI(title="PoseidonGov API")
 def get_db():
     return psycopg2.connect(
-        host="localhost",
+        host=os.environ.get("DB_HOST", "localhost"),
         port=5432,
         dbname="poseidon",
-        user="poseidon",
-        password="localdev",
+        user=os.environ.get("DB_USER", "poseidon"),
+        password=os.environ.get("DB_PASSWORD", "localdev"),
+        sslmode=os.environ.get("DB_SSLMODE", "disable")
     )
+
+
+@app.get("/test")
+def thisTest():
+    return "thsi is Test"
+
 
 
 @app.get("/companies")
@@ -94,7 +102,7 @@ def get_company_fleet(company_name: str):
         ]
     }
 @app.get("/companies/{company_name}/memo")
-def get_memo(company_name: str):
+async def get_memo(company_name: str):
     print(f"DEBUG: company_name = '{company_name}'")  # add this
     conn = get_db()
     cur = conn.cursor()

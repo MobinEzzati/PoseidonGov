@@ -1,14 +1,18 @@
 import json
 import psycopg2
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 conn = None
 try:
     conn = psycopg2.connect(
-        host="localhost",
+        host=os.environ.get("DB_HOST"),
         port=5432,
         dbname="poseidon",
-        user="poseidon",
-        password="localdev",
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASSWORD"),
+        sslmode="require"
     )
     cur = conn.cursor()
 
@@ -37,12 +41,11 @@ try:
         )
         inserted += cur.rowcount
 
-    conn.commit()                          # SAVE — must come before any close
+    conn.commit()
     print(f"Inserted {inserted} new rows")
 
-    cur.execute("SELECT count(*) FROM award")   # run the query
-
-    total = cur.fetchone()[0]                    # THEN read one result
+    cur.execute("SELECT count(*) FROM award")
+    total = cur.fetchone()[0]
     print(f"Table now has {total} total rows")
 
 except Exception as error:

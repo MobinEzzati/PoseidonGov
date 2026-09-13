@@ -49,7 +49,14 @@ Respond in EXACTLY this format:
 </key_risks>
 <recommendation>
 PASS or PROCEED — one sentence reason
-</recommendation>"""
+Mention what advise our Business consulting team can provide to this business to make them more valuable ==> in three bullet points
+</recommendation>
+<Advises>
+Mention what advise our Business consulting team can provide to this business to make them more valuable - in three bullet points
+
+</Advises
+
+"""
 
     response = client.invoke_model(
         modelId=MODEL,

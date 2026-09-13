@@ -1,0 +1,16 @@
+cat > .gitignore << 'EOF'
+.env
+*.pem
+__pycache__/
+*.pyc
+awards_raw.json
+faa_data/
+Tools/ReleasableAircraft/
+*.zip
+.aws/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+EOF.env
