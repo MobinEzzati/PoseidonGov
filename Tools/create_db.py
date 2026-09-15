@@ -1,5 +1,7 @@
 import psycopg2
 
+import os
+
 conn = psycopg2.connect(
     host="poseidongov-db.cf6s0y8eqhz4.us-east-1.rds.amazonaws.com",
     port=5432,
