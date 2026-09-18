@@ -20,3 +20,4 @@ AI-powered deal intelligence platform for PE firms evaluating aviation and GovCo
 Mobin Ezzati | MS Computer Science (AI/ML) — SM xU 2026
 # CI/CD enabled
 # CI/CD enabled
+# automated deployment working
