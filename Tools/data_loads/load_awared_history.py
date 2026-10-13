@@ -88,9 +88,13 @@ ON CONFLICT (award_id) DO NOTHING
 
 def main():
     conn = psycopg2.connect(
-        host=os.environ["DB_HOST"], port=5432, dbname="poseidon",
-        user=os.environ["DB_USER"], password=os.environ["DB_PASSWORD"],
-        sslmode="require", connect_timeout=10,
+              host='poseidongov-db.cf6s0y8eqhz4.us-east-1.rds.amazonaws.com',
+               port=5432,
+               database='poseidon',
+               user='poseidon',
+               password=os.environ.get("DB_PASSWORD"),
+               sslmode='require',
+               connect_timeout=10
     )
     total = 0
     try:
