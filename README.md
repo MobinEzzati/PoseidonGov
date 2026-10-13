@@ -19,5 +19,5 @@ AI-powered deal intelligence platform for PE firms evaluating aviation and GovCo
 ## Built by
 Mobin Ezzati | MS Computer Science (AI/ML) — SM xU 2026
 # CI/CD enabled
-# CI/CD enabled
+wrote and deployed a .Yaml file to make entire process of push -> docker build - > ecr - > deployed to EC2  automated
 # automated deployment working
