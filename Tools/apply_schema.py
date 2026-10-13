@@ -1,5 +1,7 @@
 import psycopg2
 import os
+from dotenv import load_dotenv
+load_dotenv() 
 
 conn = psycopg2.connect(
     host="poseidongov-db.cf6s0y8eqhz4.us-east-1.rds.amazonaws.com",
@@ -7,7 +9,8 @@ conn = psycopg2.connect(
     dbname="poseidon",
     user="poseidon",
     password=os.environ.get("DB_PASSWORD"),
-    sslmode="require"
+    sslmode="require",
+    connect_timeout=10,
 )
 cur = conn.cursor()
 
@@ -59,10 +62,56 @@ CREATE TABLE IF NOT EXISTS risk_score (
     anomaly_flag boolean,
     PRIMARY KEY (recipient_name, as_of)
 );
+
+-- ===== NEW: historical data for training the recompete model =====
+
+CREATE TABLE IF NOT EXISTS award_history (
+    award_id         text PRIMARY KEY,
+    vendor_name      text,
+    vendor_uei       text,
+    awarding_agency  text,
+    awarding_sub_agency text,
+    naics_code       text,
+    psc_code         text,
+    description      text,
+    start_date       date,
+    end_date         date,
+    total_value      numeric,
+    extent_competed  text,
+    offers_received  integer,
+    set_aside_type   text,
+    ingested_at      timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS recompete_training (
+    old_award_id        text PRIMARY KEY REFERENCES award_history(award_id),
+    next_award_id       text,
+    retained            boolean,
+    match_confidence    numeric,
+    value_usd           numeric,
+    duration_days       integer,
+    was_sole_source     boolean,
+    offers_received     integer,
+    agency_vendor_share numeric
+);
+
+CREATE INDEX IF NOT EXISTS idx_award_history_end_date
+    ON award_history (end_date);
+CREATE INDEX IF NOT EXISTS idx_award_history_match
+    ON award_history (awarding_agency, naics_code, start_date);
+
+-- optional: track which method produced a score
+ALTER TABLE risk_score ADD COLUMN IF NOT EXISTS model_version text;
 """
 
-cur.execute(schema)
-conn.commit()
-print("✅ Schema applied!")
-cur.close()
-conn.close()
+try:
+    cur.execute(schema)
+    conn.commit()
+    print("✅ Schema applied!")
+except Exception as e:
+    conn.rollback()
+    print(f"❌ Failed: {e}")
+    raise
+finally:
+    cur.close()
+    conn.close()
