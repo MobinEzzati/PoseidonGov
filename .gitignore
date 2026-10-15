@@ -1,6 +1,6 @@
-cat > .gitignore << 'EOF'
 .env
 *.pem
+*.log
 __pycache__/
 *.pyc
 awards_raw.json
@@ -13,4 +13,5 @@ venv/
 *.egg-info/
 dist/
 build/
-EOF.env
+models/
+data/raw/
