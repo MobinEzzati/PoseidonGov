@@ -35,11 +35,13 @@ JOIN award_history n
   AND n.start_date BETWEEN o.end_date - {GAP_BEFORE} AND o.end_date + {GAP_AFTER}
   AND n.award_id <> o.award_id
 WHERE o.total_value > {MIN_VALUE}
+  AND n.total_value > {MIN_VALUE}
   AND o.award_id LIKE '%-NONE-%-NONE-'
   AND n.award_id LIKE '%-NONE-%-NONE-'
   AND o.vendor_uei IS NOT NULL
   AND n.vendor_uei IS NOT NULL
   AND o.end_date >= '2014-10-01'
+  AND o.end_date <= DATE '2022-09-30'
   AND o.end_date <= (SELECT MAX(start_date) FROM award_history) - 365
 """, "s1_candidates"))
 
@@ -101,12 +103,11 @@ try:
             for r in cur.fetchall():
                 print("     ", r)
 
-    cur.execute(SAVE_SQL)
-    print(f"STEP 5. saved/updated {cur.rowcount} rows in recompete_training")
-    conn.commit()
+    cur.execute("DELETE FROM recompete_training WHERE old_award_id NOT IN (SELECT old_id FROM s4_final)")
+    print(f"STEP 5a. removed {cur.rowcount} stale rows")
 
-    cur.execute("SELECT COUNT(*), SUM(retained::int) FROM recompete_training")
-    total, kept = cur.fetchone()
-    print(f"\nrecompete_training now has {total} rows, {kept} kept ({kept/total:.0%})")
+    cur.execute(SAVE_SQL)
+    print(f"STEP 5b. saved/updated {cur.rowcount} rows")
+    conn.commit()
 finally:
     conn.close()
