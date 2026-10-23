@@ -5,7 +5,7 @@ evaluation cutting the manual research time and error rate that slow
 down analyst decision-making.
 
 MVP scope: PE deals in government contracting, focused on aviation and 
-construction. The architecture is built to generalize — the long-term goal 
+construction. The architecture is built to generalize  the long-term goal 
 is a diligence engine for PE more broadly, not just this niche.
 
 
