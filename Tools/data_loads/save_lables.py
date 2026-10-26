@@ -1,6 +1,8 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
+from datetime import date, timedelta
+
 
 load_dotenv()
 
@@ -10,7 +12,9 @@ MIN_SIM   = 0.6      # how alike the descriptions must be (0 to 1)
 GAP_BEFORE = 30      # new contract may start this many days BEFORE the old one ended
 GAP_AFTER  = 365     # ...or up to this many days AFTER
 SHOW_SAMPLE = True   # print 3 example rows after each step
+DATA_ENDS = date(2026, 9, 30)
 
+LABEL_CUTOFF = DATA_ENDS - timedelta(days=GAP_AFTER)
 # Used in two places, so defined once: strip the leading item number like "8501781762!"
 def clean(col):
     return f"regexp_replace(COALESCE({col},''), '^[0-9]+!', '')"
@@ -41,9 +45,10 @@ WHERE o.total_value > {MIN_VALUE}
   AND o.vendor_uei IS NOT NULL
   AND n.vendor_uei IS NOT NULL
   AND o.end_date >= '2014-10-01'
-  AND o.end_date <= DATE '2022-09-30'
-  AND o.end_date <= (SELECT MAX(start_date) FROM award_history) - 365
+  AND o.end_date <= DATE '{LABEL_CUTOFF}'
 """, "s1_candidates"))
+
+print(f"Labeling contracts that ended {'2014-10-01'} to {LABEL_CUTOFF} (data ends {DATA_ENDS})")
 
 # STEP 2: keep only pairs whose descriptions are alike
 STEPS.append((f"2. similar descriptions (sim >= {MIN_SIM})", f"""

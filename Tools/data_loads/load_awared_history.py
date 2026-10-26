@@ -11,7 +11,7 @@ load_dotenv()
 API = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 CAP = 10000
 
-FISCAL_YEARS = range(2014, 2024)
+FISCAL_YEARS = range(2014, 2027)
 NAICS_CODES = ["336411", "336412", "336413", "488190", "488111"]
 AGENCIES = [
     "Department of Defense",

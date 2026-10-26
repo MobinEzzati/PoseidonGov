@@ -15,3 +15,5 @@ dist/
 build/
 models/
 data/raw/
+.DS_Store
+.idea
