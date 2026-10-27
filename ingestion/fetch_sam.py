@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+from pathlib import Path
+
+RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
+
 URL = "https://api.sam.gov/opportunities/v2/search"
 
 
@@ -39,7 +43,8 @@ def fetch_SamData():
 
         print(f"- {opp.get('title', 'no title')}  ({opp.get('postedDate', '')})")
 
-    with open("sam_raw.json", "w") as f:
+    RAW.mkdir(parents=True, exist_ok=True)
+    with open(RAW / "sam_raw.json", "w") as f:
         json.dump(opportunities, f, indent=2)
 
 

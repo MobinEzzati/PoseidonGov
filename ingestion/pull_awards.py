@@ -1,6 +1,10 @@
 import json
 import requests
 
+from pathlib import Path
+
+RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
+
 url = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
 
@@ -48,9 +52,10 @@ def pull_data_usaspending(max_pages=50):
             break
         page += 1
 
-    with open("awards_raw.json", "w") as f:
+    RAW.mkdir(parents=True, exist_ok=True)
+    with open(RAW / "awards_raw.json", "w") as f:
         json.dump(all_results, f, indent=2)
 
-    print(f"\nDone. Saved {len(all_results)} awards to awards_raw.json")
+    print(f"\nDone. Saved {len(all_results)} awards to {RAW / 'awards_raw.json'}")
 
 pull_data_usaspending()

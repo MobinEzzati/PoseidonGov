@@ -1,6 +1,11 @@
 import zipfile
 import requests
 import pandas as pd
+from pathlib import Path
+
+RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
+ZIP_PATH = RAW / "ReleasableAircraft.zip"
+EXTRACT_DIR = RAW / "ReleasableAircraft"
 
 URL = "https://registry.faa.gov/database/ReleasableAircraft.zip"
 
@@ -16,19 +21,20 @@ def download_faa():
     resp.raise_for_status()
 
     # "wb" = write BINARY — a zip is not text, so plain "w" would corrupt it
-    with open("ReleasableAircraft.zip", "wb") as f:
+    RAW.mkdir(parents=True, exist_ok=True)
+    with open(ZIP_PATH, "wb") as f:
         f.write(resp.content)
 
-    with zipfile.ZipFile("ReleasableAircraft.zip") as z:
+    with zipfile.ZipFile(ZIP_PATH) as z:
         print("\nFiles inside the zip:")
         for name in z.namelist():
             print(f"  {name}")
-        z.extractall("faa_data")
-    print("\nExtracted to faa_data/")
+        z.extractall(EXTRACT_DIR)
+    print(f"\nExtracted to {EXTRACT_DIR}")
 
 
 def explore_master():
-    master = pd.read_csv("faa_data/MASTER.txt", dtype=str)
+    master = pd.read_csv(EXTRACT_DIR / "MASTER.txt", dtype=str)
     master.columns = master.columns.str.strip()
 
     # Strip trailing spaces from the NAME values themselves (not just headers)

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 # load_awared_history.py  (v3)
 import os, time, calendar, itertools, logging
 import requests
@@ -29,10 +31,11 @@ FIELDS = [
 # and is what pushes big slices over the 10,000-row cap.
 MIN_AWARD_AMOUNT = 250000
 
+(Path(__file__).resolve().parents[2] / "data" / "logs").mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s",
-    handlers=[logging.StreamHandler(), logging.FileHandler("load_award_history.log")],
+    handlers=[logging.StreamHandler(), logging.FileHandler(Path(__file__).resolve().parents[2] / "data" / "logs" / "load_award_history.log")],
 )
 log = logging.getLogger("loader")
 

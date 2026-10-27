@@ -2,6 +2,10 @@ import json
 import psycopg2
 import os
 
+from pathlib import Path
+
+RAW = Path(__file__).resolve().parents[2] / "data" / "raw"
+
 conn = None
 try:
     conn = psycopg2.connect(
@@ -13,7 +17,7 @@ try:
     )
     cur = conn.cursor()
 
-    with open("/Users/mobinezzati/Desktop/Portfolios/AIMLProjects/PoseidonGov/ingestion/clients/awards_raw.json") as f:
+    with open(RAW / "awards_raw.json") as f:
         awards = json.load(f)
     print(f"Loaded {len(awards)} awards from file")
 

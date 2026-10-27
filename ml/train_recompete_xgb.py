@@ -8,7 +8,7 @@ Reads the labeled pairs from recompete_training, pulls features from
 award_history, does a TIME-BASED split (train on older contracts, test on
 newer ones), trains the model, and compares it against a dumb baseline.
 
-Run:  python train_recompete_xgb.py
+Run:  python -m ml.train_recompete_xgb
 Needs: pip install xgboost scikit-learn pandas psycopg2-binary python-dotenv
 """
 

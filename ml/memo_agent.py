@@ -1,12 +1,11 @@
 import boto3
 import json
 import psycopg2
-import sys
 import re
 import os
 from dotenv import load_dotenv
 from langsmith import traceable
-from ML.risk_scoring import (
+from ml.risk_scoring import (
     compute_hhi, interpret_hhi,
     compute_recompete_risk, interpret_recompete,
     get_agency_breakdown
@@ -19,9 +18,6 @@ os.environ["LANGCHAIN_TRACING_V2"] = os.environ.get("LANGCHAIN_TRACING_V2", "fal
 os.environ["LANGSMITH_API_KEY"] = os.environ.get("LANGCHAIN_API_KEY", "")
 os.environ["LANGCHAIN_PROJECT"] = os.environ.get("LANGCHAIN_PROJECT", "poseidongov")
 os.environ["LANGSMITH_ENDPOINT"] = os.environ.get("LANGSMITH_ENDPOINT","https://eu.api.smith.langchain.com")
-
-sys.path.append("..")
-
 
 client = boto3.client("bedrock-runtime", region_name="us-east-1")
 MODEL = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"

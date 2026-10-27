@@ -10,3 +10,5 @@ scikit-learn
 pandas
 numpy
 joblib
+langsmith
+tqdm

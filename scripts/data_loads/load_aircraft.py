@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 from psycopg2.extras import execute_values
 load_dotenv()
 
+from pathlib import Path
+
+RAW = Path(__file__).resolve().parents[2] / "data" / "raw"
+
 conn = None
 try:
     conn = psycopg2.connect(
@@ -17,7 +21,7 @@ try:
     )
     cur = conn.cursor()
 
-    with open("/Users/mobinezzati/Desktop/Portfolios/AIMLProjects/PoseidonGov/Tools/ReleasableAircraft/MASTER.txt") as f:
+    with open(RAW / "ReleasableAircraft" / "MASTER.txt") as f:
         airCrafts = pd.read_csv(f, dtype=str)
         airCrafts.columns = airCrafts.columns.str.strip()
         print(f"Loaded {len(airCrafts)} aircraft from file")

@@ -24,9 +24,9 @@ Python, FastAPI, Streamlit, PostgreSQL (pgvector), Docker, AWS (RDS, ECR, Bedroc
 cp .env.example .env            # local values for the docker-compose database
 docker-compose up -d            # Postgres on localhost:5432
 pip install -r requirements.txt
-python Tools/apply_schema.py    # create tables from schema.sql
-uvicorn app.main:app --reload   # API on http://localhost:8000
-streamlit run app/streamlit_app.py
+python scripts/db_setup/apply_schema.py   # create tables
+uvicorn app.main:app --reload             # API on http://localhost:8000
+streamlit run frontend/streamlit_app.py   # dashboard
 ```
 
 Configuration is read from environment variables (see `.env.example`):
@@ -42,6 +42,20 @@ Never commit `.env*` files other than `.env.example`.
 | `GET /companies/{name}/risk` | HHI, recompete risk, agency breakdown (404 if unknown) |
 | `GET /companies/{name}/fleet` | Registered aircraft owned by the company |
 | `GET /companies/{name}/memo` | AI diligence memo (404 if unknown) |
+
+## Project structure
+```
+app/         FastAPI service (main.py wires routers/, deps.py, db.py)
+ml/          risk scoring, memo agent, recompete XGBoost training
+ingestion/   pull USASpending / SAM.gov / FAA data into data/raw/
+scripts/     db_setup/ (schema, DB creation), data_loads/ (load into Postgres), adhoc/ (one-off checks)
+frontend/    Streamlit dashboard
+db/          schema.sql
+docs/        ARCHITECTURE.md (target design; the MVP is a subset)
+data/        local raw downloads and logs (git-ignored)
+poseidon-web Next.js frontend (not built yet)
+```
+Run Python modules from the repo root, e.g. `python -m ml.memo_agent`.
 
 ## CI/CD
 Pushing to `main` runs `.github/workflows/continuous-integration.yml`, which
