@@ -31,9 +31,18 @@ def compute_hhi(cur, company_name: str) -> float:
         GROUP BY awarding_agency
     """, (company_name,))
     rows = cur.fetchall()
-    total = sum(row[1] for row in rows)
-    hhi = sum((row[1] / total) ** 2 for row in rows)
-    return hhi
+    total = sum(row[1] for row in rows if row[1] is not None)
+    if not total:
+        return 0.0
+    return sum((row[1] / total) ** 2 for row in rows if row[1] is not None)
+
+
+def company_exists(cur, company_name: str) -> bool:
+    cur.execute(
+        "SELECT 1 FROM award WHERE recipient_name = %s LIMIT 1",
+        (company_name,),
+    )
+    return cur.fetchone() is not None
 
 
 def get_agency_breakdown(cur, company_name: str):
