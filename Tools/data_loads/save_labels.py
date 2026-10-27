@@ -88,7 +88,7 @@ ON CONFLICT (old_award_id) DO UPDATE SET
 """
 
 conn = psycopg2.connect(
-    host='poseidongov-db.cf6s0y8eqhz4.us-east-1.rds.amazonaws.com',
+    host=os.environ["DB_HOST"],
     port=5432, database='poseidon', user='poseidon',
     password=os.environ.get("DB_PASSWORD"), sslmode='require', connect_timeout=10
 )

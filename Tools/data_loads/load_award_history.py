@@ -36,7 +36,7 @@ logging.basicConfig(
 )
 log = logging.getLogger("loader")
 
-DB_HOST = os.environ.get("DB_HOST", "poseidongov-db.cf6s0y8eqhz4.us-east-1.rds.amazonaws.com")
+DB_HOST = os.environ["DB_HOST"]
 DB_USER = os.environ.get("DB_USER", "poseidon")
 
 def get_conn():

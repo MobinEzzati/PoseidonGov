@@ -3,7 +3,7 @@ import psycopg2
 import os
 
 conn = psycopg2.connect(
-    host="poseidongov-db.cf6s0y8eqhz4.us-east-1.rds.amazonaws.com",
+    host=os.environ["DB_HOST"],
     port=5432,
     dbname="postgres",
     user="poseidon",

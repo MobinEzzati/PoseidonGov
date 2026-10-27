@@ -53,7 +53,7 @@ ORDER BY next_id, sim DESC, gap_days
 conn = None
 try:
     conn = psycopg2.connect(
-        host='poseidongov-db.cf6s0y8eqhz4.us-east-1.rds.amazonaws.com',
+        host=os.environ["DB_HOST"],
         port=5432,
         database='poseidon',
         user='poseidon',

@@ -34,7 +34,7 @@ NUMERIC     = ["log_value", "duration_days"]
 
 # ---------- 1. load the labeled data ----------
 conn = psycopg2.connect(
-    host='poseidongov-db.cf6s0y8eqhz4.us-east-1.rds.amazonaws.com',
+    host=os.environ["DB_HOST"],
     port=5432, database='poseidon', user='poseidon',
     password=os.environ["DB_PASSWORD"], sslmode='require', connect_timeout=10,
 )

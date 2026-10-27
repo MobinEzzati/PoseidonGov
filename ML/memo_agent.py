@@ -96,10 +96,9 @@ def parse_memo(memo_text: str) -> dict:
     }
 
 if __name__ == "__main__":
-    conn = psycopg2.connect(
-        host="localhost", port=5432,
-        dbname="poseidon", user="poseidon", password="localdev",
-    )
+    from app.db import get_db
+
+    conn = get_db()
     cur = conn.cursor()
 
     memo = generate_memo(cur, "CONCUR TECHNOLOGIES, INC.")
