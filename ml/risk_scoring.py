@@ -4,6 +4,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+from ml.recompete_model import interpret_recompete_model, score_company
+
 
 def interpret_hhi(hhi: float) -> str:
     if hhi > 0.6:
@@ -81,6 +83,22 @@ def compute_recompete_risk(cur, company_name: str) -> float:
     return max(scores)
 
 
+def compute_recompete(cur, company_name: str) -> dict:
+    """XGBoost score when the model and the company's contract history are
+    available, otherwise the rule-based score."""
+    result = score_company(cur, company_name)
+    if result is not None:
+        return {**result, "label": interpret_recompete_model(result["score"])}
+    score = compute_recompete_risk(cur, company_name)
+    return {
+        "score": score,
+        "label": interpret_recompete(score),
+        "method": "rule_based",
+        "model_version": "rule_based_v1",
+        "contracts_scored": None,
+    }
+
+
 def score_all_companies(cur, min_awards: int = 5) -> list:
     cur.execute("""
         SELECT recipient_name, COUNT(*) as award_count
@@ -97,7 +115,7 @@ def score_all_companies(cur, min_awards: int = 5) -> list:
             company,
             hhi,
             interpret_hhi(hhi),
-            compute_recompete_risk(cur, company),
+            compute_recompete(cur, company),
         ))
     results.sort(key=lambda x: x[1], reverse=True)
     return results
@@ -106,12 +124,13 @@ def score_all_companies(cur, min_awards: int = 5) -> list:
 def save_score_scores(cur, conn, scores):
     for company, hhi, label, recompete in scores:
         cur.execute("""
-            INSERT INTO risk_score (recipient_name, as_of, hhi_agency, recompete_risk)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO risk_score (recipient_name, as_of, hhi_agency, recompete_risk, model_version)
+            VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (recipient_name, as_of) DO UPDATE
                 SET hhi_agency = EXCLUDED.hhi_agency,
-                    recompete_risk = EXCLUDED.recompete_risk
-        """, (company, datetime.date.today(), hhi, recompete))
+                    recompete_risk = EXCLUDED.recompete_risk,
+                    model_version = EXCLUDED.model_version
+        """, (company, datetime.date.today(), hhi, recompete["score"], recompete["model_version"]))
     conn.commit()
     print(f"Saved {len(scores)} risk scores")
 
@@ -139,7 +158,7 @@ if __name__ == "__main__":
     print("\nAll companies ranked by concentration risk:")
     all_scores = score_all_companies(cur)
     for company, hhi, hhi_label, recompete in all_scores:
-        print(f"  {company[:40]:40} HHI:{hhi:.2f} {hhi_label:10} Recompete:{recompete:.2f} {interpret_recompete(recompete)}")
+        print(f"  {company[:40]:40} HHI:{hhi:.2f} {hhi_label:10} Recompete:{recompete['score']:.2f} {recompete['label']:6} ({recompete['method']})")
 
     save_score_scores(cur, conn, all_scores)
 

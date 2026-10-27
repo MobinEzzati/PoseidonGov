@@ -15,9 +15,12 @@ venv/
 *.egg-info/
 dist/
 build/
-models/
+models/*
+!models/recompete_xgb_v1.json
+!models/recompete_xgb_v1_meta.json
 data/raw/
 .DS_Store
 .idea.DS_Store
 .idea/
 data/
+ml/models/

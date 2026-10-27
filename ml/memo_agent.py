@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from langsmith import traceable
 from ml.risk_scoring import (
     compute_hhi, interpret_hhi,
-    compute_recompete_risk, interpret_recompete,
+    compute_recompete,
     get_agency_breakdown
 )
 
@@ -28,7 +28,7 @@ def generate_memo(cur, company_name: str) -> str:
 
     # Gather all data first
     hhi = compute_hhi(cur, company_name)
-    recompete = compute_recompete_risk(cur, company_name)
+    recompete = compute_recompete(cur, company_name)
     breakdown = get_agency_breakdown(cur, company_name)
 
     # Build the context
@@ -43,7 +43,7 @@ COMPANY: {company_name}
 
 RISK SCORES:
 - HHI Concentration: {hhi:.4f} ({interpret_hhi(hhi)})
-- Recompete Risk: {recompete:.4f} ({interpret_recompete(recompete)})
+- Recompete Risk: {recompete['score']:.4f} ({recompete['label']}, {recompete['method']} estimate)
 
 AGENCY BREAKDOWN:
 {agency_text}
