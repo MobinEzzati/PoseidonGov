@@ -43,6 +43,17 @@ Never commit `.env*` files other than `.env.example`.
 | `GET /companies/{name}/fleet` | Registered aircraft owned by the company |
 | `GET /companies/{name}/memo` | AI diligence memo (404 if unknown) |
 
+## Recompete risk model
+`/risk` and the memo use an XGBoost model (`models/recompete_xgb_v1.json`) that
+predicts whether an incumbent keeps a contract at recompete (risk = 1 - chance
+kept, value-weighted over contracts ending within 24 months). It is trained on
+about 1,000 labeled recompetes with hold-out AUC ~0.71 (0.59-0.78 across
+time-ordered folds), so treat it as a relative ranking, not a probability.
+It only knows 4 aircraft/defense NAICS codes and 47 contracting offices; when
+under 70% of a company's contract value is familiar to it (or it has no
+contract history), the API falls back to the rule-based score and says so in
+`recompete_method`. Retrain with `python -m ml.train_recompete_xgb`.
+
 ## Project structure
 ```
 app/         FastAPI service (main.py wires routers/, deps.py, db.py)

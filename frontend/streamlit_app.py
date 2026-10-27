@@ -75,6 +75,14 @@ if "risk_data" in st.session_state:
     with col2:
         risk_card("Recompete Risk", f"{data['recompete_risk']:.4f}", data["recompete_label"])
 
+    if data.get("recompete_method") == "xgboost":
+        st.caption(
+            f"Recompete risk: XGBoost estimate over {data['recompete_contracts_scored']} "
+            "contracts ending within 24 months (a relative ranking, not a probability)."
+        )
+    else:
+        st.caption("Recompete risk: rule-based estimate (too little data for the model).")
+
     st.divider()
 
     st.subheader("Revenue by Agency")
