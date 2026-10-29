@@ -20,7 +20,7 @@ models/*
 !models/recompete_xgb_v1_meta.json
 data/raw/
 .DS_Store
-.idea.DS_Store
 .idea/
 data/
+.claude/settings.local.json
 ml/models/
