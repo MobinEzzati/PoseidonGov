@@ -24,7 +24,7 @@ def get_companies():
         if r.status_code == 200:
             return sorted(list(r.json().keys()))
         return []
-    except:
+    except requests.exceptions.RequestException:
         st.error(
 
    
