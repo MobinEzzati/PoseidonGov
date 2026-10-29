@@ -1,7 +1,12 @@
 import streamlit as st
 import requests
+import os
+from dotenv import load_dotenv
+from urllib.parse import quote
 
-API = "http://100.51.21.135:8000"
+
+load_dotenv()
+API = os.environ.get("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="PoseidonGov", page_icon="🔱", layout="wide")  # ← FIRST
 
@@ -20,18 +25,31 @@ def get_companies():
             return sorted(list(r.json().keys()))
         return []
     except:
+        st.error(
+
+   
+          "The system was unable to establish a connection to the primary database.",
+          title="Connection Timeout",
+           icon="🚨"
+            )
         return []
 
+def fetch_risk(name: str) -> dict | None:
+    """Fetch risk data for one company. Shows an error and returns None on failure."""
+    try:
+        r = requests.get(f"{API}/companies/{quote(name, safe='')}/risk", timeout=15)
+    except requests.exceptions.RequestException as e:
+        st.error(f"Could not reach the API: {e}")
+        return None
+    if r.status_code == 404:
+        st.error(f"Company not found: {name}")
+        return None
+    if r.status_code != 200:
+        st.error(f"API error {r.status_code}: {r.text[:300]}")
+        return None
+    return r.json()
 
 companies = get_companies()
-
-# companies = [
-#     "CONCUR TECHNOLOGIES, INC.",
-#     "CW GOVERNMENT TRAVEL INC",
-#     "FEDERAL EXPRESS CORPORATION",
-#     "UNITED AIRLINES, INC.",
-#     "ADVANCED AIR AMBULANCE, CORP.",
-# ]
 
 def risk_card(label, value, risk_label):
     color = {
@@ -54,20 +72,23 @@ def risk_card(label, value, risk_label):
     """, unsafe_allow_html=True)
 
 company = st.selectbox("Select company:", companies)
-st.session_state["company"] = company
 
-if st.button("Analyze", type="primary"):
+if st.button("Analyze", type="primary", disabled=not company):
     with st.spinner("Running risk analysis..."):
-        r = requests.get(f"{API}/companies/{company}/risk", timeout=15)
-    if r.status_code != 200:
-        st.error(f"Company not found: {company}")
+        data = fetch_risk(company)
+    if data is None:
         st.session_state.pop("risk_data", None)
+        st.session_state.pop("analyzed_company", None)
     else:
-        st.session_state["risk_data"] = r.json()
+        st.session_state["risk_data"] = data
+        st.session_state["analyzed_company"] = company
+    st.session_state.pop("memo", None)   # never show a memo from an older analysis
+
 
 if "risk_data" in st.session_state:
     data = st.session_state["risk_data"]
-    company = st.session_state["company"]
+    company = st.session_state["analyzed_company"]
+    company_path = quote(company, safe="")  # names can contain "/", "#", "&"
 
     col1, col2 = st.columns(2)
     with col1:
@@ -96,7 +117,7 @@ if "risk_data" in st.session_state:
 
     st.subheader("Fleet Analysis")
     with st.spinner("Loading fleet data..."):
-        fleet_r = requests.get(f"{API}/companies/{company}/fleet", timeout=15)
+        fleet_r = requests.get(f"{API}/companies/{company_path}/fleet", timeout=15)
     if fleet_r.status_code == 200:
         fleet = fleet_r.json()
         st.metric("Registered Aircraft", fleet["fleet_size"])
@@ -112,7 +133,7 @@ if "risk_data" in st.session_state:
         with st.spinner("Generating memo via AWS Bedrock... (15-20 seconds)"):
             try:
                 memo_r = requests.get(
-                    f"{API}/companies/{company}/memo",
+                    f"{API}/companies/{company_path}/memo",
                     timeout=60
                 )
                 if memo_r.status_code == 200:
@@ -138,3 +159,4 @@ if "risk_data" in st.session_state:
 
 st.divider()
 st.caption("Data sources: USASpending.gov · SAM.gov · FAA Aircraft Registry | Built by Mobin Ezzati")
+
