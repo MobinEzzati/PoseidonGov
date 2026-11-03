@@ -20,7 +20,6 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score, average_precision_score, brier_score_loss
 from xgboost import XGBClassifier
-
 from app.db import get_db
 from ml.recompete_features import CATEGORICAL, FEATURES, NUMERIC, build_features
 
@@ -50,14 +49,12 @@ WHERE t.match_confidence >= %s
 def make_model(y_train):
     # scale_pos_weight balances the two classes so the model doesn't just
     # predict the majority. max_depth=3 keeps it simple so it won't memorize.
-    neg, pos = (y_train == 0).sum(), (y_train == 1).sum()
     return XGBClassifier(
         max_depth=3,
         learning_rate=0.05,
         n_estimators=300,
         subsample=0.9,
         colsample_bytree=0.9,
-        scale_pos_weight=neg / max(pos, 1),
         enable_categorical=True,
         tree_method="hist",
         eval_metric="logloss",
