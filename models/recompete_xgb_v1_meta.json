@@ -5,9 +5,9 @@
   "min_confidence": 0.6,
   "test_fraction": 0.2,
   "metrics_from": "hold-out test; saved model is refit on all rows",
-  "auc": 0.7142585189415572,
-  "avg_precision": 0.6823192652234548,
-  "brier": 0.22160570323467255,
+  "auc": 0.7120692937369123,
+  "avg_precision": 0.6914137115330863,
+  "brier": 0.22222980856895447,
   "brier_baseline": 0.2504238548483046,
   "features_numeric": [
     "log_value",

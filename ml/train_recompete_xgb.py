@@ -43,12 +43,13 @@ JOIN award_history o ON o.award_id = t.old_award_id
 WHERE t.match_confidence >= %s
   AND t.value_usd IS NOT NULL
   AND o.end_date IS NOT NULL
+ORDER BY t.old_award_id
 """
 
 
 def make_model(y_train):
-    # scale_pos_weight balances the two classes so the model doesn't just
-    # predict the majority. max_depth=3 keeps it simple so it won't memorize.
+    # max_depth=3 and a low learning rate keep the model simple so it doesn't
+    # memorize. No class weighting: the classes are nearly balanced (52/48).
     return XGBClassifier(
         max_depth=3,
         learning_rate=0.05,
