@@ -1,22 +1,44 @@
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_score
 
 from app.db import get_db
 from ml.recompete_features import build_features
-from ml.train_recompete_xgb import MIN_CONF, QUERY, make_model
+from ml.train_recompete_xgb import MIN_CONF, make_model
 
 TEST_YEARS = range(2020, 2026)   # 2020, 2021, ..., 2025
+PURGE = True
+
+BACK_TEST_QUERY = """
+SELECT t.retained,
+       t.value_usd,
+       t.duration_days,
+       o.award_id,
+       o.awarding_sub_agency,
+       o.naics_code,
+       o.psc_code,
+       o.end_date,
+       n.start_date as next_start_date 
+FROM recompete_training t
+JOIN award_history o ON o.award_id = t.old_award_id
+JOIN award_history n ON n.award_id = t.next_award_id
+WHERE t.match_confidence >= %s
+  AND t.value_usd IS NOT NULL
+  AND o.end_date IS NOT NULL
+"""
+
 
 
 def load_pairs() -> pd.DataFrame:
     conn = get_db()
     with conn.cursor() as cur:
-        cur.execute(QUERY, (MIN_CONF,))
+        cur.execute(BACK_TEST_QUERY, (MIN_CONF,))
         df = pd.DataFrame(cur.fetchall(), columns=[d[0] for d in cur.description])
     conn.close()
 
     df["end_date"] = pd.to_datetime(df["end_date"])
+    df["next_start_date"] = pd.to_datetime(df["next_start_date"])
     df["year"] = df["end_date"].dt.year
     return df
 
@@ -58,6 +80,10 @@ def main():
     results = []
     for test_year in TEST_YEARS:
         train_mask = df["year"] < test_year
+        if PURGE:
+            # Only train on pairs whose outcome was known before the test year began
+            year_start = pd.Timestamp(test_year, 1, 1)
+            train_mask = train_mask & (df["next_start_date"] < year_start)
         test_mask = df["year"] == test_year
         row = evaluate_year(X, y, train_mask, test_mask, test_year)
         if row is not None:
@@ -70,7 +96,8 @@ def main():
     print("\nSummary across years:")
     print(table[["auc", "brier", "brier_baseline"]].agg(["mean", "min", "max"]).round(3))
     print(f"\nModel beat the baseline in {table['beats_baseline'].sum()} of {len(table)} years")
-
+    print(f"Purge: {'ON' if PURGE else 'OFF'}\n")
 
 if __name__ == "__main__":
     main()
+
