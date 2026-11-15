@@ -24,3 +24,5 @@ data/raw/
 data/
 .claude/settings.local.json
 ml/models/
+.neon
+node_modules/
