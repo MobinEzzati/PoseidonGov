@@ -1,6 +1,4 @@
 from app.db import get_db
-import json
-import os
 
 QUERY = """
 SELECT relname AS table_name,
@@ -20,9 +18,6 @@ def main():
         res = cur.fetchall() 
         print(res)
     conn.close()
-
-
-
 
 if __name__ == "__main__":
     main()
