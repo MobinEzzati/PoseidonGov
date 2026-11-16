@@ -1,5 +1,9 @@
 FROM python:3.12-slim
 
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0 /lambda-adapter /opt/extensions/lambda-adapter
+ENV AWS_LWA_PORT=8000
+ENV AWS_LWA_READINESS_CHECK_PATH=/health
+
 # xgboost needs the OpenMP runtime, which the slim image lacks
 RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
     && rm -rf /var/lib/apt/lists/*

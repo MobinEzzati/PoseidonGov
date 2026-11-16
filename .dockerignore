@@ -14,3 +14,5 @@ scripts/
 ingestion/
 docs/
 *.md
+node_modules/
+.neon
