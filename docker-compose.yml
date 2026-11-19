@@ -3,7 +3,7 @@ services:          # the list of containers you want running
     image: pgvector/pgvector:pg16      # which image (recipe) to build it from
     container_name: poseidon_db   # the running container's name (for commands/logs)
     environment:              # settings passed INTO the container at startup
-      POSTGRES_USER: poseidon       # Postgres reads these special vars
+      POSTGRES_USER: poseidn       # Postgres reads these special vars
       POSTGRES_PASSWORD: localdev   # and auto-configures itself accordingly
       POSTGRES_DB: poseidon         # creates a database with this name on first boot
     ports:

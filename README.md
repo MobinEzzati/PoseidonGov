@@ -44,7 +44,7 @@ Never commit `.env*` files other than `.env.example`.
 | `GET /companies/{name}/memo` | AI diligence memo (404 if unknown) |
 
 ## Recompete risk model
-`/risk` and the memo use an XGBoost model (`models/recompete_xgb_v1.json`) that
+`/risk` and the memoo use an XGBoost model (`models/recompete_xgb_v1.json`) that
 predicts whether an incumbent keeps a contract at recompete (risk = 1 - chance
 kept, value-weighted over contracts ending within 24 months). It is trained on
 about 1,000 labeled recompetes with hold-out AUC ~0.71 (0.59-0.78 across
