@@ -54,3 +54,22 @@ def get_company_risk(company_name: str):
             for row in breakdown
         ],
     }
+
+
+GRAPH_TOP_N = 10 
+@router.get("/graph")
+def get_company_graph(limit: int = GRAPH_TOP_N):
+     with db_cursor() as cur:
+        cur.execute(
+            """
+            SELECT recipient_name
+            FROM award
+            """
+        )
+
+        res = cur.fetchall()
+        print(res)
+
+
+
+    
